@@ -3,7 +3,7 @@ defmodule EasterBunnyHeadquartersTest do
   doctest EasterBunnyHeadquarters, import: true
 
   test "problem 1" do
-    assert EasterBunnyHeadquarters.distance(input) == 243
+    assert EasterBunnyHeadquarters.distance_to_path(input) == 243
   end
 
   test "problem 2" do

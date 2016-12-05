@@ -1,4 +1,8 @@
 defmodule EasterBunnyHeadquarters do
+  defmodule Position do
+    defstruct direction: :north, x: 0, y: 0
+  end
+
   @doc """
   iex> EasterBunnyHeadquarters.distance("")
   0
@@ -25,16 +29,16 @@ defmodule EasterBunnyHeadquarters do
     |> distance
   end
   def distance(path) when is_list(path) do
-    origin = {:north, 0, 0}
-    {_, x, y} = destination(origin, path)
+    origin = %Position{}
+    %Position{x: x, y: y} = destination(origin, path)
     abs(x) + abs(y)
   end
 
-  defp destination(position = {_, _, _}, []), do: position
-  defp destination({direction, x, y}, [{spin, steps} | rest]) do
+  defp destination(position = %Position{}, []), do: position
+  defp destination(%Position{direction: direction, x: x, y: y}, [{spin, steps} | rest]) do
     direction = turn(direction, spin)
     {x, y} = move(direction, x, y, steps)
-    destination({direction, x, y}, rest)
+    destination(%Position{direction: direction, x: x, y: y}, rest)
   end
 
   defp turn(direction, :r) do
@@ -59,9 +63,13 @@ defmodule EasterBunnyHeadquarters do
   defp move(:south, x, y, steps), do: {x - steps, y}
   defp move(:west, x, y, steps), do: {x, y - steps}
 
-  defp parse_step(<<char :: utf8>> <> steps_string) do
-    {String.to_atom(String.downcase(List.to_string([char]))),
-     String.to_integer(steps_string)}
+  defp parse_step(<<char :: utf8>> <> step_string) do
+    direction = [char]
+    |> List.to_string
+    |> String.downcase
+    |> String.to_atom
+    steps = String.to_integer(step_string)
+    {direction, steps}
   end
 
   defp parse_path(path_string) do

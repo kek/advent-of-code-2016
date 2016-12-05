@@ -12,23 +12,23 @@ defmodule EasterBunnyHeadquarters do
   end
 
   @doc """
-  iex> EasterBunnyHeadquarters.distance("")
+  iex> distance("")
   0
-  iex> EasterBunnyHeadquarters.distance("R1")
+  iex> distance("R1")
   1
-  iex> EasterBunnyHeadquarters.distance("R1, L1")
+  iex> distance("R1, L1")
   2
-  iex> EasterBunnyHeadquarters.distance("R2, L3")
+  iex> distance("R2, L3")
   5
-  iex> EasterBunnyHeadquarters.distance("R2, R2, R2")
+  iex> distance("R2, R2, R2")
   2
-  iex> EasterBunnyHeadquarters.distance("R5, L5, R5, R3")
+  iex> distance("R5, L5, R5, R3")
   12
-  iex> EasterBunnyHeadquarters.distance("L1, L1, L1, L1")
+  iex> distance("L1, L1, L1, L1")
   0
-  iex> EasterBunnyHeadquarters.distance("R1, R1, R1, R1")
+  iex> distance("R1, R1, R1, R1")
   0
-  iex> EasterBunnyHeadquarters.distance("R20, L1, L19, L2")
+  iex> distance("R20, L1, L19, L2")
   2
   """
   def distance(path) when is_binary(path) do
@@ -38,21 +38,31 @@ defmodule EasterBunnyHeadquarters do
   end
   def distance(path) when is_list(path) do
     origin = %Position{}
-    %Position{direction: _, location: %Location{x: x, y: y}, trail: trail} = destination(origin, path)
+    final_position = destination(origin, path)
+    distance(final_position.location)
+  end
+  def distance(nil), do: nil
+  def distance(%Location{x: x, y: y}) do
     abs(x) + abs(y)
   end
 
   @doc """
-  iex> EasterBunnyHeadquarters.first_visited_twice("R1")
+  iex> distance_to_first_visited_twice("R1")
   nil
-  iex> EasterBunnyHeadquarters.first_visited_twice("R1, R1, R1, R1")
-  %EasterBunnyHeadquarters.Location{x: 0, y: 0}
+  iex> distance_to_first_visited_twice("R1, R1, R1, R1")
+  0
+  iex> distance_to_first_visited_twice("R2, R1, R1, R1, R1")
+  1
+  iex> distance_to_first_visited_twice("R8, R4, R4, R8")
+  4
   """
-  def first_visited_twice(path) when is_binary(path) do
+  def distance_to_first_visited_twice(path) when is_binary(path) do
     path
     |> parse_path
     |> first_visited_twice
+    |> distance
   end
+
   def first_visited_twice(path) do
     origin = %Position{}
     %Position{trail: trail} = destination(origin, path)
@@ -70,12 +80,32 @@ defmodule EasterBunnyHeadquarters do
   end
 
   def destination(position = %Position{}, []), do: position
-  def destination(%Position{direction: direction, location: %Location{x: x, y: y}, trail: trail},
-    [%Movement{spin: spin, steps: steps} | rest]) do
-    direction = turn(direction, spin)
-    location = move(direction, x, y, steps)
-    trail = trail ++ [location]
+  def destination(position = %Position{}, [%Movement{spin: spin, steps: steps} | rest]) do
+    direction = turn(position.direction, spin)
+    location = move(direction, position.location.x, position.location.y, steps)
+    trail = position.trail ++ trail(position.location, location)
     destination(%Position{direction: direction, location: location, trail: trail}, rest)
+  end
+
+  def trail(%Location{x: x, y: y}, %Location{x: x1, y: y1}) when y == y1 and x1 > x do
+    for x <- (x + 1)..(x1) do
+      %Location{x: x, y: y}
+    end
+  end
+  def trail(%Location{x: x, y: y}, %Location{x: x1, y: y1}) when y == y1 and x1 < x do
+    for x <- (x - 1)..(x1) do
+      %Location{x: x, y: y}
+    end
+  end
+  def trail(%Location{x: x, y: y}, %Location{x: x1, y: y1}) when x == x1 and y1 > y do
+    for y <- (y + 1)..(y1) do
+      %Location{x: x, y: y}
+    end
+  end
+  def trail(%Location{x: x, y: y}, %Location{x: x1, y: y1}) when x == x1 and y1 < y do
+    for y <- (y - 1)..(y1) do
+      %Location{x: x, y: y}
+    end
   end
 
   defp turn(direction, :r) do
@@ -95,12 +125,12 @@ defmodule EasterBunnyHeadquarters do
     end
   end
 
-  defp move(:north, x, y, steps), do: %Location{x: x + steps, y: y}
-  defp move(:east, x, y, steps), do: %Location{x: x, y: y + steps}
-  defp move(:south, x, y, steps), do: %Location{x: x - steps, y: y}
-  defp move(:west, x, y, steps), do: %Location{x: x, y: y - steps}
+  defp move(:north, x, y, steps), do: %Location{x: x,         y: y + steps}
+  defp move(:east, x, y, steps), do:  %Location{x: x + steps, y: y}
+  defp move(:south, x, y, steps), do: %Location{x: x,         y: y - steps}
+  defp move(:west, x, y, steps), do:  %Location{x: x - steps, y: y}
 
-  defp parse_path(path_string) do
+  def parse_path(path_string) do
     path_string
     |> String.split(",")
     |> Enum.reject(&(&1 == ""))
@@ -108,7 +138,7 @@ defmodule EasterBunnyHeadquarters do
     |> Enum.map(&parse_step/1)
   end
 
-  defp parse_step(<<char :: utf8>> <> step_string) do
+  def parse_step(<<char :: utf8>> <> step_string) do
     spin = [char]
     |> List.to_string
     |> String.downcase

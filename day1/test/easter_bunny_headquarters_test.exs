@@ -2,8 +2,13 @@ defmodule EasterBunnyHeadquartersTest do
   use ExUnit.Case
   doctest EasterBunnyHeadquarters
 
-  test "the solution" do
+  test "problem 1" do
     assert EasterBunnyHeadquarters.distance(input) == 243
+  end
+
+  test "problem 2" do
+    assert EasterBunnyHeadquarters.first_visited_twice(input) ==
+      %EasterBunnyHeadquarters.Location{x: -140, y: 131}
   end
 
   def input do

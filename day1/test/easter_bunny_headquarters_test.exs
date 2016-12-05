@@ -3,7 +3,7 @@ defmodule EasterBunnyHeadquartersTest do
   doctest EasterBunnyHeadquarters
 
   test "the solution" do
-    assert EasterBunnyHeadquarters.distance(input) == 31
+    assert EasterBunnyHeadquarters.distance(input) == 243
   end
 
   def input do

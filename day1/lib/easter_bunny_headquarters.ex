@@ -47,49 +47,29 @@ defmodule EasterBunnyHeadquarters do
   0
   iex> EasterBunnyHeadquarters.distance("R1, R1, R1, R1")
   0
+  iex> EasterBunnyHeadquarters.distance("R20, L1, L19, L2")
+  2
   """
   def distance(path) when is_binary(path) do
     path
     |> parse_path
     |> distance
   end
-  def distance(path) do
+  def distance(path) when is_list(path) do
     origin = {:north, 0, 0}
     {_, x, y} = destination(origin, path)
-    abs(x + y)
+    abs(x) + abs(y)
   end
 
   defp destination(position = {_, _, _}, []),         do: position
-  defp destination({:north, x, y}, [{:r, n} | rest]), do: destination({:east, x, y + n}, rest)
-  defp destination({:north, x, y}, [{:l, n} | rest]), do: destination({:west, x, y - n}, rest)
-  defp destination({:east,  x, y}, [{:r, n} | rest]), do: destination({:south, x, y - n}, rest)
-  defp destination({:east,  x, y}, [{:l, n} | rest]), do: destination({:north, x, y + n}, rest)
-  defp destination({:west,  x, y}, [{:r, n} | rest]), do: destination({:north, x, y + n}, rest)
-  defp destination({:west,  x, y}, [{:l, n} | rest]), do: destination({:south, x, y - n}, rest)
-  defp destination({:south, x, y}, [{:r, n} | rest]), do: destination({:west, x - n, y}, rest)
-  defp destination({:south, x, y}, [{:l, n} | rest]), do: destination({:east, x, y + n}, rest)
-
-  # defp distance([], position), do: 0
-  # defp distance([{:r, steps}], {:north, x, y}), do: steps
-  # defp distance([{:r, steps}], {:east, x, y}), do: steps
-  # defp distance([{:r, steps}], {:south, x, y}), do: steps
-  # defp distance([{:r, steps}], {:west, x, y}), do: steps
-  # defp distance([{:l, steps}], {:north, x, y}), do: steps
-  # defp distance([{:l, steps}], {:east, x, y}), do: steps
-  # defp distance([{:l, steps}], {:south, x, y}), do: steps
-  # defp distance([{:l, steps}], {:west, x, y}), do: steps
-  # defp distance([head | tail], position = {:north, x, y}) do
-  #   distance([head], position) + distance(tail, position)
-  # end
-  # defp distance([head | tail], position = {:east, x, y}) do
-  #   distance([head], position) + distance(tail, position)
-  # end
-  # defp distance([head | tail], position = {:south, x, y}) do
-  #   distance([head], position) + distance(tail, position)
-  # end
-  # defp distance([head | tail], position = {:west, x, y}) do
-  #   distance([head], position) + distance(tail, position)
-  # end
+  defp destination({:north, x, y}, [{:r, n} | rest]), do: destination({:east,  x + n, y    }, rest)
+  defp destination({:north, x, y}, [{:l, n} | rest]), do: destination({:west,  x - n, y    }, rest)
+  defp destination({:east,  x, y}, [{:r, n} | rest]), do: destination({:south, x,     y - n}, rest)
+  defp destination({:east,  x, y}, [{:l, n} | rest]), do: destination({:north, x,     y + n}, rest)
+  defp destination({:west,  x, y}, [{:r, n} | rest]), do: destination({:north, x,     y + n}, rest)
+  defp destination({:west,  x, y}, [{:l, n} | rest]), do: destination({:south, x,     y - n}, rest)
+  defp destination({:south, x, y}, [{:r, n} | rest]), do: destination({:west,  x - n, y    }, rest)
+  defp destination({:south, x, y}, [{:l, n} | rest]), do: destination({:east,  x + n, y    }, rest)
 
   defp parse_step(<<char :: utf8>> <> steps_string) do
     {String.to_atom(String.downcase(List.to_string([char]))),

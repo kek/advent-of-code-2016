@@ -1,24 +1,29 @@
-# RoomChecksums
+Advent of Code[About][AoC++][Events][Settings][Log Out]Karl Eklund 6*
+   var y=2016;[Calendar][Leaderboard][Stats][Sponsors]
+Our sponsors help make AoC possible:
+A&K Rentals - Affordable, high-quality homes just north of Kansas City.
 
-**TODO: Add description**
 
-## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+--- Day 4: Security Through Obscurity ---
 
-  1. Add `room_checksums` to your list of dependencies in `mix.exs`:
+Finally, you come across an information kiosk with a list of rooms. Of course, the list is encrypted and full of decoy data, but the instructions to decode the list are barely hidden nearby. Better remove the decoy data first.
 
-    ```elixir
-    def deps do
-      [{:room_checksums, "~> 0.1.0"}]
-    end
-    ```
+Each room consists of an encrypted name (lowercase letters separated by dashes) followed by a dash, a sector ID, and a checksum in square brackets.
 
-  2. Ensure `room_checksums` is started before your application:
+A room is real (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetization. For example:
 
-    ```elixir
-    def application do
-      [applications: [:room_checksums]]
-    end
-    ```
+aaaaa-bbb-z-y-x-123[abxyz] is a real room because the most common letters are a (5), b (3), and then a tie between x, y, and z, which are listed alphabetically.
+a-b-c-d-e-f-g-h-987[abcde] is a real room because although the letters are all tied (1 of each), the first five are listed alphabetically.
+not-a-real-room-404[oarel] is a real room.
+totally-real-room-200[decoy] is not.
+Of the real rooms from the list above, the sum of their sector IDs is 1514.
 
+What is the sum of the sector IDs of the real rooms?
+
+To begin, get your puzzle input.
+
+Answer:
+ [Submit]
+
+You can also [Share] this puzzle.

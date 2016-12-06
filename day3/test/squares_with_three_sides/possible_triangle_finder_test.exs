@@ -7,6 +7,10 @@ defmodule SquaresWithThreeSides.PossibleTriangleFinderTest do
     assert PossibleTriangleFinder.count(input) == 862
   end
 
+  test "the second_solution" do
+    assert PossibleTriangleFinder.rotated_count(input) == 1577
+  end
+
   def input do
     """
     785  516  744

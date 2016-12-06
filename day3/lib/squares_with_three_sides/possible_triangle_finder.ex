@@ -8,8 +8,32 @@ defmodule SquaresWithThreeSides.PossibleTriangleFinder do
   def count(input) do
     input
     |> parse_input
-    |> Enum.filter(&possible_triangle?/1)
+    |> filter_out_impossible
     |> Enum.count
+  end
+
+  def rotated_count(input) do
+    input
+    |> parse_input
+    |> rotate
+    |> filter_out_impossible
+    |> Enum.count
+  end
+
+  @doc """
+  iex> rotate([[:a, :b, :c], [:a, :b, :c], [:a, :b, :c]])
+  [[:a, :a, :a], [:b, :b, :b], [:c, :c, :c]]
+  """
+  def rotate(rows) do
+    numbers =
+      Enum.map(rows, &Enum.at(&1, 0)) ++
+      Enum.map(rows, &Enum.at(&1, 1)) ++
+      Enum.map(rows, &Enum.at(&1, 2))
+    Enum.chunk(numbers, 3)
+  end
+
+  defp filter_out_impossible(triangles) do
+    Enum.filter(triangles, &possible_triangle?/1)
   end
 
   defp possible_triangle?([a, b, c]) do

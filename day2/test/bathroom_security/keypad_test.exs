@@ -3,6 +3,7 @@ defmodule BathroomSecurity.KeypadTest do
   doctest BathroomSecurity.Keypad, import: true
 
   setup do
+    # BathroomSecurity.Keypad.set_map(BathroomSecurity.Keypad.OrdinaryMap)
     BathroomSecurity.Keypad.reset
   end
 
@@ -23,8 +24,13 @@ defmodule BathroomSecurity.KeypadTest do
     assert BathroomSecurity.Keypad.code(instructions) == "1985"
   end
 
-  test "the solution" do
+  test "the solution to the first problem" do
     assert BathroomSecurity.Keypad.code(riddle) == "82958"
+  end
+
+  test "the solution to the second problem" do
+    BathroomSecurity.Keypad.set_map(BathroomSecurity.Keypad.TiltedMap)
+    assert BathroomSecurity.Keypad.code(riddle) == "B3DB8"
   end
 
   def riddle do

@@ -1,15 +1,11 @@
 defmodule BathroomSecurity.Keypad do
   use GenServer
 
-  defstruct code: "", finger: "5"
+  defstruct code: "", finger: "5", map: BathroomSecurity.Keypad.OrdinaryMap
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
-  end
+  def start_link, do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
 
-  def init(_) do
-    {:ok, %__MODULE__{}}
-  end
+  def init(_), do: {:ok, %__MODULE__{}}
 
   @doc """
   iex> code("")
@@ -26,13 +22,11 @@ defmodule BathroomSecurity.Keypad do
     get_code
   end
 
-  defp get_code do
-    GenServer.call(__MODULE__, {:get_code})
-  end
+  defp get_code, do: GenServer.call(__MODULE__, {:get_code})
 
-  def reset do
-    GenServer.call(__MODULE__, {:reset})
-  end
+  def reset, do: GenServer.call(__MODULE__, {:reset})
+
+  def set_map(map), do: GenServer.call(__MODULE__, {:set_map, map})
 
   defp add_row(row) do
     Enum.each(row, &move_finger(&1))
@@ -48,13 +42,13 @@ defmodule BathroomSecurity.Keypad do
   end
 
   def handle_call({:move_finger, direction}, _, state) do
-    finger = neighbor(state.finger, direction)
-    {:reply, :ok, %__MODULE__{state | finger: finger}}
+    finger = state.map.neighbor(state.finger, direction)
+    {:reply, :ok, %{state | finger: finger}}
   end
 
   def handle_call({:press_button}, _, state) do
     code = "#{state.code}#{state.finger}"
-    state = %__MODULE__{state | code: code}
+    state = %{state | code: code}
     {:reply, :ok, state}
   end
 
@@ -66,52 +60,8 @@ defmodule BathroomSecurity.Keypad do
     {:reply, :ok, %__MODULE__{}}
   end
 
-  # 1 2 3
-  # 4 5 6
-  # 7 8 9
-  defp neighbor(f, "U") do
-    case f do
-      "4" -> "1"
-      "5" -> "2"
-      "6" -> "3"
-      "7" -> "4"
-      "8" -> "5"
-      "9" -> "6"
-      x -> x
-    end
-  end
-  defp neighbor(f, "D") do
-    case f do
-      "1" -> "4"
-      "2" -> "5"
-      "3" -> "6"
-      "4" -> "7"
-      "5" -> "8"
-      "6" -> "9"
-      x -> x
-    end
-  end
-  defp neighbor(f, "L") do
-    case f do
-      "2" -> "1"
-      "3" -> "2"
-      "5" -> "4"
-      "6" -> "5"
-      "8" -> "7"
-      "9" -> "8"
-      x -> x
-    end
-  end
-  defp neighbor(f, "R") do
-    case f do
-      "1" -> "2"
-      "2" -> "3"
-      "4" -> "5"
-      "5" -> "6"
-      "7" -> "8"
-      "8" -> "9"
-      x -> x
-    end
+  def handle_call({:set_map, map}, _, state) do
+    {:reply, :ok, %{state | map: map}}
   end
 
   @doc """

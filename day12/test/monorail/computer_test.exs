@@ -8,10 +8,6 @@ defmodule Monorail.ComputerTest do
     :ok
   end
 
-  test "getting the registers" do
-    assert Computer.registers == {0, 0, 0, 0}
-  end
-
   test "loading a program" do
     Computer.load("")
     Computer.run

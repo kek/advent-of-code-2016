@@ -8,6 +8,7 @@ defmodule Monorail do
 
     # Define workers and child supervisors to be supervised
     children = [
+      worker(Monorail.Computer, [])
       # Starts a worker by calling: Monorail.Worker.start_link(arg1, arg2, arg3)
       # worker(Monorail.Worker, [arg1, arg2, arg3]),
     ]

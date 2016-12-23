@@ -2,7 +2,7 @@ defmodule Monorail.Computer do
   use GenServer
 
   defmodule State do
-    defstruct program: [], registers: {0, 0, 0, 0}
+    defstruct program: [], registers: {0, 0, 0, 0}, pc: 0
   end
 
   def start_link, do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -25,11 +25,20 @@ defmodule Monorail.Computer do
   end
 
   def handle_call({:run}, _, state) do
-    registers = Enum.reduce(state.program, state.registers, &apply_instruction/2)
-    {:reply, :ok, %State{state | registers: registers}}
+    state = Enum.reduce_while(1..10000, state, &step/2)
+    # registers = Enum.reduce(state.program, state.registers, &apply_instruction/2)
+    {:reply, :ok, state}
   end
 
-  defp apply_instruction([instruction | operands], registers) do
-    apply(Monorail.Instructions, instruction, [registers | operands])
+  defp step(_, state) do
+    if state.pc >= length(state.program) do
+      {:halt, state}
+    else
+      instruction = state.program
+      |> Enum.at(state.pc)
+
+      state = apply(Monorail.Instructions, hd(instruction), [state | tl(instruction)])
+      {:cont, state}
+    end
   end
 end
